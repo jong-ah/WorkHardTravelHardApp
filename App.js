@@ -8,6 +8,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 import { Fontisto } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -59,19 +60,30 @@ export default function App() {
 
   // 메모 삭제
   const deleteToDo = (key) => {
-    Alert.alert('Delete To Do', 'Are you sure?', [
-      { text: 'Cancel' },
-      {
-        text: "I'm Sure",
-        style: 'destructive',
-        onPress: () => {
-          const newToDos = { ...toDos };
-          delete newToDos[key];
-          setToDos(newToDos);
-          saveToDos(newToDos);
+    if (Platform.OS === 'web') {
+      const ok = confirm('Do you want to delete this To Do?');
+
+      if (ok) {
+        const newToDos = { ...toDos };
+        delete newToDos[key];
+        setToDos(newToDos);
+        saveToDos(newToDos);
+      }
+    } else {
+      Alert.alert('Delete To Do', 'Are you sure?', [
+        { text: 'Cancel' },
+        {
+          text: "I'm Sure",
+          style: 'destructive',
+          onPress: () => {
+            const newToDos = { ...toDos };
+            delete newToDos[key];
+            setToDos(newToDos);
+            saveToDos(newToDos);
+          },
         },
-      },
-    ]);
+      ]);
+    }
   };
 
   return (
@@ -81,7 +93,11 @@ export default function App() {
         {/* TouchableOpactiy는 button:hover처럼 누르는 애니메이션 효과가 있다. */}
         <TouchableOpacity onPress={work}>
           <Text
-            style={{ ...styles.btnText, color: working ? 'white' : theme.grey }}
+            style={{
+              fontSize: 38,
+              fontWeight: '600',
+              color: working ? 'white' : theme.grey,
+            }}
           >
             Work
           </Text>
@@ -89,7 +105,8 @@ export default function App() {
         <TouchableOpacity onPress={travel}>
           <Text
             style={{
-              ...styles.btnText,
+              fontSize: 38,
+              fontWeight: '600',
               color: !working ? 'white' : theme.grey,
             }}
           >
@@ -133,10 +150,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     marginTop: 100,
-  },
-  btnText: {
-    fontSize: 38,
-    fontWeight: '600',
   },
   input: {
     backgroundColor: 'white',
